@@ -1,7 +1,10 @@
 export interface Product {
-  id: number
-  name: string
-  price: number
-  category: string
-  rating: number
+  _id?: string;
+  id?: number;
+  name: string;
+  price: number;
+  category: string;
+  rating?: number;
+  description?: string;
+  stock?: number;
 }
