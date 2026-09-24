@@ -6,27 +6,48 @@ import {
   getProfile,
 } from "../controllers/authController.js";
 import { protect } from "../middleware/authMiddleware.js";
+import { validate } from "../middleware/validateMiddleware.js";
 
 const router = express.Router();
 
 router.post(
   "/register",
   [
-    body("name").trim().notEmpty().withMessage("Name is required"),
-    body("email").isEmail().withMessage("Valid email is required"),
+    body("name")
+      .trim()
+      .notEmpty()
+      .withMessage("Name is required")
+      .isLength({ max: 100 })
+      .withMessage("Name must be 100 characters or less"),
+
+    body("email")
+      .trim()
+      .isEmail()
+      .withMessage("Valid email is required")
+      .normalizeEmail(),
+
     body("password")
-      .isLength({ min: 6 })
-      .withMessage("Password must be at least 6 characters"),
+      .isLength({ min: 8 })
+      .withMessage("Password must be at least 8 characters"),
   ],
+  validate,
   registerUser,
 );
 
 router.post(
   "/login",
   [
-    body("email").isEmail().withMessage("Valid email is required"),
-    body("password").notEmpty().withMessage("Password is required"),
+    body("email")
+      .trim()
+      .isEmail()
+      .withMessage("Valid email is required")
+      .normalizeEmail(),
+
+    body("password")
+      .notEmpty()
+      .withMessage("Password is required"),
   ],
+  validate,
   loginUser,
 );
 

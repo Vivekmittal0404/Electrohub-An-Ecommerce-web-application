@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
 const generateToken = (id) =>
-  jwt.sign({ id }, process.env.JWT_SECRET || "electrohub-local-secret", {
+  jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
 
@@ -11,11 +11,19 @@ export const registerUser = async (req, res) => {
     const { name, email, password, phone } = req.body;
 
     const existingUser = await User.findOne({ email });
+
     if (existingUser) {
-      return res.status(409).json({ message: "User already exists" });
+      return res.status(409).json({
+        message: "User already exists",
+      });
     }
 
-    const user = await User.create({ name, email, password, phone });
+    const user = await User.create({
+      name,
+      email,
+      password,
+      phone,
+    });
 
     res.status(201).json({
       _id: user._id,
@@ -26,7 +34,9 @@ export const registerUser = async (req, res) => {
       token: generateToken(user._id),
     });
   } catch (error) {
-    res.status(400).json({ message: error.message || "Registration failed" });
+    res.status(400).json({
+      message: error.message || "Registration failed",
+    });
   }
 };
 
@@ -35,13 +45,19 @@ export const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
+
     if (!user) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(401).json({
+        message: "Invalid email or password",
+      });
     }
 
     const isMatch = await user.matchPassword(password);
+
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(401).json({
+        message: "Invalid email or password",
+      });
     }
 
     res.json({
@@ -53,7 +69,9 @@ export const loginUser = async (req, res) => {
       token: generateToken(user._id),
     });
   } catch (error) {
-    res.status(400).json({ message: error.message || "Login failed" });
+    res.status(400).json({
+      message: error.message || "Login failed",
+    });
   }
 };
 
